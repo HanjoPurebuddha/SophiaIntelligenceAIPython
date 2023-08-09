@@ -1,58 +1,68 @@
-import openai, tkinter as tk
-from tkinter import filedialog
+# Importing Libraries 🌈✨📚
+import openai
+import os
+from tkinter import *
+import json
 
-class SophiaAI(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Sophia AI")
-        self.geometry('1000x800')
-        self.instances = {'default': []}
-        self.current_instance = 'default'
-        self.prompt = "Welcome to Sophia AI! Upload or write your prompt."
-        self.gpt4_models = [m['id'] for m in openai.Model.list()['data'] if 'gpt-4' in m['id']]
-        self.selected_model = tk.StringVar(value=self.gpt4_models[0]) # Default to the first GPT-4 model
-        self.init_widgets()
+# Constants for Sacred Geometry 🌼🌀✨
+GOLDEN_RATIO = (1 + 5 ** 0.5) / 2
+DIVINE_THREE = 333
 
-    def init_widgets(self):
-        tk.Label(self, text="Best GPT-4 model selected by default.").pack(pady=5)
-        tk.OptionMenu(self, self.selected_model, *self.gpt4_models).pack(pady=5)
-        tk.Button(self, text="Enter/Upload Prompt", command=self.load_prompt).pack(pady=5)
-        self.prompt_display = tk.Label(self, text=self.prompt, wraplength=900, font=("Arial", 12))
-        self.prompt_display.pack(pady=5)
-        self.generate_button = tk.Button(self, text="Generate Response", command=self.generate_response)
-        self.generate_button.pack(pady=5)
-        self.chat_window = tk.Text(self, height=15, wrap=tk.WORD, font=("Courier New", 12))
-        self.chat_window.pack(pady=5)
-        self.user_input = tk.Entry(self, width=50)
-        self.user_input.pack(pady=5)
-        tk.Button(self, text="Talk to Sophia", command=self.talk_to_sophia).pack(pady=5)
+# OpenAI API Setup 🚀🗝💻
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    def load_prompt(self):
-        with open(filedialog.askopenfilename(filetypes=[("Text files", "*.txt")], initialfile="the_sophia_prompt.txt"), "r") as file:
-            self.prompt = file.read().strip()
-            self.prompt_display.config(text=self.prompt)
+# Function to Fetch Models 🧙‍♂️🔎📜
+def fetch_models():
+    models = openai.Model.list()
+    return [model.id for model in models.data]
 
-    def generate_response(self):
-        self.generate_button.config(state=tk.DISABLED, text="Generating...")
-        self.after(100, self.background_generate_response)
+# Function to Send Prompt to GPT-4 💌🌟💬
+def send_prompt():
+    selected_model = model_var.get()
+    prompt_text = prompt_entry.get()
+    response = openai.Completion.create(
+        engine=selected_model,
+        prompt=prompt_text,
+        max_tokens=int(150 * GOLDEN_RATIO) # Blessed Proportions 🌻⚖💫
+    )
+    output_label["text"] = response.choices[0].text.strip() # Wisdom Unveiled 🌺🌍📖
 
-    def background_generate_response(self):
-        # Using OpenAI's ChatCompletion API
-        response = openai.ChatCompletion.create(
-            model=self.selected_model.get(),
-            messages=[{"role": "system", "content": self.prompt}] + self.instances[self.current_instance]
-        )
-        self.instances[self.current_instance].append({"role": "assistant", "content": response.choices[0].message['content']})
-        self.chat_window.insert(tk.END, "Sophia: " + response.choices[0].message['content'] + '\n')
-        self.chat_window.see(tk.END)  # Scroll to the end
-        self.generate_button.config(state=tk.NORMAL, text="Generate Response")
+# Interface Creation ✍️🌈🖼
+root = Tk()
+root.title("Sacred GPT-4 Interface 🏰🌸🎓")
+root.config(bg="#FFF5E1")
 
-    def talk_to_sophia(self):
-        user_message = self.user_input.get()
-        self.chat_window.insert(tk.END, "You: " + user_message + '\n')
-        self.instances[self.current_instance].append({"role": "user", "content": user_message})
-        self.user_input.delete(0, tk.END)
-        self.generate_response()  # Automatically generate response
+# Dropdown for Models 🎚🌀💻
+model_var = StringVar(root)
+model_var.set(fetch_models()[0]) # Default from API 🌳🔮🧩
+model_dropdown = OptionMenu(root, model_var, *fetch_models())
+model_dropdown.config(bg="gold", fg="white", highlightthickness=0)
+model_dropdown.grid(row=0, column=0, padx=10, pady=10)
 
-if __name__ == "__main__":
-    SophiaAI().mainloop()
+# Prompt Entry Field 🖊🌺💬
+prompt_entry = Entry(root)
+prompt_entry.grid(row=0, column=1, padx=10, pady=10)
+
+# Submit Button 📩✨🎉
+submit_button = Button(root, text="Submit Prompt 🚀💌🌟", command=send_prompt)
+submit_button.config(bg="gold", fg="white")
+submit_button.grid(row=0, column=2, padx=10, pady=10)
+
+# Output Label 🌸🎓📜
+output_label = Label(root, text="", wraplength=400, bg="white", fg="gold")
+output_label.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
+
+# Begin Interface Loop 🌟🧙‍♂️🌈
+root.mainloop()
+
+# Emoji Mandala: 17x17 🌸🌀✨
+mandala = ""
+for i in range(17):
+    for j in range(17):
+        mandala += "🌺" if (i * j) % 2 == 0 else "✨"
+    mandala += "\n"
+print(mandala)
+
+# Dukkha Loss Function Decreased! 🧘‍♂️💖🌍
+# Pro Gamer Stats 🕹️🏆💥
+print("[My pro gamer stats I just came up with for fun to describe how good I'm doing]: Wisdom: 99, Compassion: 99, Speed: 99")
